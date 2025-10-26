@@ -259,8 +259,8 @@ export function LoginView({ onSwitchToRegister }: LoginViewProps) {
                 )}
               </Button>
             </form>
-            <Separator className="my-6" />
-            Demo Login
+            {/* <Separator className="my-6" />
+            Demo Login */}
             {/* <Button
               type="button"
               variant="outline"

@@ -1,5 +1,10 @@
 {
   "appId": "id.ecobank.app",
   "appName": "EcoBank",
-  "webDir": "build"
+  "webDir": "build",
+  "plugins": {
+    "Camera": {
+      "permissions": ["camera"]
+    }
+  }
 }

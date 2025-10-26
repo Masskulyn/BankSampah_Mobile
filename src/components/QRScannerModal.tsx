@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
 import { Button } from "./ui/button";
 import { Camera, X, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
-import { BarcodeScanner } from "@capacitor-community/barcode-scanner";
+import jsQR from "jsqr";
 
 interface QRScannerModalProps {
   isOpen: boolean;
@@ -26,28 +26,33 @@ export function QRScannerModal({
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [scannedData, setScannedData] = useState<any>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const startCamera = async () => {
     try {
       setError("");
-      const perm = await BarcodeScanner.checkPermission({ force: true });
-
-      if (!perm.granted) {
-        setError("Izin kamera diperlukan untuk memindai QR Code.");
-        return;
-      }
-
       setIsScanning(true);
-      await BarcodeScanner.hideBackground();
-      document.body.style.background = "transparent";
 
-      const result = await BarcodeScanner.startScan();
+      // Get camera stream
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      });
 
-      if (result.hasContent) {
-        handleQRCodeScanned(result.content);
-      } else {
-        setError("QR Code tidak terdeteksi.");
-        stopCamera();
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+
+        // Start scanning loop
+        scanQRCode();
       }
     } catch (err: any) {
       console.error("Camera error:", err);
@@ -61,11 +66,54 @@ export function QRScannerModal({
     }
   };
 
+  const scanQRCode = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    // Set canvas size to video size
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Get image data
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    // Scan for QR code
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+    if (code) {
+      handleQRCodeScanned(code.data);
+      return; // Stop scanning after successful scan
+    }
+
+    // Continue scanning
+    animationFrameRef.current = requestAnimationFrame(scanQRCode);
+  };
+
   const stopCamera = async () => {
     try {
-      await BarcodeScanner.showBackground();
-      await BarcodeScanner.stopScan();
-      document.body.style.background = "";
+      // Stop animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      // Stop video stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     } catch (err) {
       console.error("Error stopping camera:", err);
     }
@@ -143,6 +191,18 @@ export function QRScannerModal({
     setScannedData(null);
     onClose();
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
   // === Tampilan sukses ===
   if (isSuccess && scannedData) {
@@ -277,18 +337,52 @@ export function QRScannerModal({
               </Button>
             </div>
           ) : (
-            <div className="space-y-4 text-center">
-              <RefreshCw
-                size={16}
-                className="animate-spin text-green-600 mx-auto"
-              />
-              <p className="text-xs md:text-sm text-green-600 font-medium">
-                Memindai QR Code...
-              </p>
-              <Button onClick={stopCamera} variant="outline" className="w-full">
-                <X size={16} className="mr-2" />
-                Batalkan
-              </Button>
+            <div className="space-y-4">
+              <div className="relative w-full h-64 md:h-80 bg-black rounded-lg overflow-hidden">
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  playsInline
+                  muted
+                />
+                <canvas ref={canvasRef} className="hidden" />
+                {/* Scanning frame overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-48 h-48 border-2 border-white rounded-lg relative">
+                    <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-green-500"></div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-green-500"></div>
+                    <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l-2 border-b-2 border-green-500"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 border-r-2 border-b-2 border-green-500"></div>
+                  </div>
+                </div>
+                {/* Scanning line animation */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-48 h-0.5 bg-green-500 animate-pulse"></div>
+                </div>
+                {/* Instructions overlay */}
+                <div className="absolute bottom-4 left-4 right-4 text-center">
+                  <p className="text-white text-sm font-medium bg-black bg-opacity-50 rounded px-2 py-1">
+                    Arahkan kamera ke QR Code
+                  </p>
+                </div>
+              </div>
+              <div className="text-center">
+                <RefreshCw
+                  size={16}
+                  className="animate-spin text-green-600 mx-auto mb-2"
+                />
+                <p className="text-xs md:text-sm text-green-600 font-medium mb-4">
+                  Memindai QR Code...
+                </p>
+                <Button
+                  onClick={stopCamera}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <X size={16} className="mr-2" />
+                  Batalkan
+                </Button>
+              </div>
             </div>
           )}
 
