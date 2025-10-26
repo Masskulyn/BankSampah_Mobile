@@ -1,0 +1,36 @@
+{
+  "appId": "id.ecobank.app",
+  "appName": "EcoBank",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "keystore/ecobank.keystore",
+      "keystoreAlias": "ecobank"
+    },
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#10b981",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "androidSpinnerStyle": "large",
+      "spinnerColor": "#ffffff"
+    },
+    "Camera": {
+      "permissions": [
+        "camera"
+      ]
+    },
+    "StatusBar": {
+      "backgroundColor": "#10b981",
+      "style": "light"
+    }
+  }
+}
