@@ -130,7 +130,7 @@ export function QRScannerModal({
         setError(
           "QR Code tidak valid. Pastikan QR Code dari sistem bank sampah."
         );
-        stopCamera();
+        // stopCamera(); // Removed to keep camera on until valid QR is scanned
       }
     } catch (err) {
       // Jika gagal parse JSON, anggap bukan QR valid → simulasi data
@@ -142,7 +142,7 @@ export function QRScannerModal({
     setScannedData(data);
     setIsSuccess(true);
     setIsScanning(false);
-    stopCamera();
+    // stopCamera(); // Removed to keep camera on during success display
 
     // Auto-close setelah 2 detik
     setTimeout(() => {
@@ -161,18 +161,21 @@ export function QRScannerModal({
           wasteWeight: 2.5,
           pricePerKg: 2000,
           amount: 5000,
+          recyclable: true,
         },
         {
           wasteType: "kertas",
           wasteWeight: 2.0,
           pricePerKg: 1500,
           amount: 3000,
+          recyclable: true,
         },
         {
           wasteType: "kaleng",
           wasteWeight: 0.2,
           pricePerKg: 2500,
           amount: 500,
+          recyclable: true,
         },
       ],
       adminId: "admin_001",
@@ -190,6 +193,13 @@ export function QRScannerModal({
     setIsSuccess(false);
     setScannedData(null);
     onClose();
+  };
+
+  const handleRetry = () => {
+    setError("");
+    setIsSuccess(false);
+    setScannedData(null);
+    // Do not stop camera, just reset state to continue scanning
   };
 
   // Cleanup on unmount
@@ -278,6 +288,18 @@ export function QRScannerModal({
                           Rp {item.amount.toLocaleString("id-ID")}
                         </span>
                       </div>
+                      <div className="flex justify-between items-center mt-0.5">
+                        <span className="text-[10px] md:text-xs text-gray-500">
+                          Dapat Didaur Ulang:
+                        </span>
+                        <span
+                          className={`text-[10px] md:text-xs font-semibold ${
+                            item.recyclable ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {item.recyclable ? "Ya" : "Tidak"}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -296,6 +318,20 @@ export function QRScannerModal({
                     {new Date(scannedData.timestamp).toLocaleString("id-ID")}
                   </span>
                 </div>
+              </div>
+
+              <div className="flex gap-2 mt-4">
+                <Button
+                  onClick={handleRetry}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  Scan Lagi
+                </Button>
+                <Button onClick={handleClose} className="flex-1">
+                  Selesai
+                </Button>
               </div>
             </div>
           </div>
@@ -389,7 +425,17 @@ export function QRScannerModal({
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs">{error}</AlertDescription>
+              <AlertDescription className="text-xs">
+                {error}
+                <Button
+                  onClick={handleRetry}
+                  variant="outline"
+                  size="sm"
+                  className="ml-2"
+                >
+                  Coba Lagi
+                </Button>
+              </AlertDescription>
             </Alert>
           )}
         </div>

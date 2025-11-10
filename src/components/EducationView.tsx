@@ -1,4 +1,17 @@
-import { BookOpen, Video, Info, ExternalLink, Leaf, Lightbulb, Recycle, TreePine, ArrowLeft } from "lucide-react";
+import {
+  BookOpen,
+  Video,
+  Info,
+  ExternalLink,
+  Leaf,
+  Lightbulb,
+  Recycle,
+  TreePine,
+  ArrowLeft,
+  FileText,
+  PlayCircle,
+  BarChart3,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -13,78 +26,88 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
     {
       id: 1,
       title: "Cara Memilah Sampah dengan Benar",
-      description: "Pelajari teknik pemilahan sampah organik, anorganik, dan B3 untuk daur ulang optimal.",
+      description:
+        "Pelajari teknik pemilahan sampah organik, anorganik, dan B3 untuk daur ulang optimal.",
       category: "Panduan",
       readTime: "5 menit",
       icon: <Recycle className="w-5 h-5" />,
-      color: "text-green-600 bg-green-100"
+      color: "text-green-600 bg-green-100",
     },
     {
       id: 2,
       title: "Manfaat Daur Ulang untuk Lingkungan",
-      description: "Ketahui dampak positif daur ulang terhadap pengurangan emisi karbon dan pelestarian alam.",
+      description:
+        "Ketahui dampak positif daur ulang terhadap pengurangan emisi karbon dan pelestarian alam.",
       category: "Edukasi",
       readTime: "7 menit",
       icon: <TreePine className="w-5 h-5" />,
-      color: "text-blue-600 bg-blue-100"
+      color: "text-blue-600 bg-blue-100",
     },
     {
       id: 3,
       title: "Tips Mengurangi Sampah Plastik",
-      description: "Panduan praktis mengurangi penggunaan plastik sekali pakai dalam kehidupan sehari-hari.",
+      description:
+        "Panduan praktis mengurangi penggunaan plastik sekali pakai dalam kehidupan sehari-hari.",
       category: "Tips",
       readTime: "4 menit",
       icon: <Lightbulb className="w-5 h-5" />,
-      color: "text-yellow-600 bg-yellow-100"
+      color: "text-yellow-600 bg-yellow-100",
     },
     {
       id: 4,
       title: "Zero Waste Lifestyle",
-      description: "Memulai gaya hidup tanpa sampah dengan langkah-langkah sederhana namun efektif.",
+      description:
+        "Memulai gaya hidup tanpa sampah dengan langkah-langkah sederhana namun efektif.",
       category: "Gaya Hidup",
       readTime: "6 menit",
       icon: <Leaf className="w-5 h-5" />,
-      color: "text-emerald-600 bg-emerald-100"
-    }
+      color: "text-emerald-600 bg-emerald-100",
+    },
   ];
 
   const videos = [
     {
       id: 1,
       title: "Tutorial Memilah Sampah",
-      thumbnail: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400",
+      thumbnail:
+        "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400",
       duration: "3:45",
-      views: "12.5K"
+      views: "12.5K",
     },
     {
       id: 2,
       title: "Proses Daur Ulang Plastik",
-      thumbnail: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400",
+      thumbnail:
+        "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400",
       duration: "5:20",
-      views: "8.2K"
+      views: "8.2K",
     },
     {
       id: 3,
       title: "Kompos dari Sampah Organik",
-      thumbnail: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400",
+      thumbnail:
+        "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400",
       duration: "4:15",
-      views: "15.3K"
-    }
+      views: "15.3K",
+    },
   ];
 
   const infographics = [
     {
       id: 1,
       title: "Waktu Dekomposisi Sampah",
-      description: "Berapa lama sampah membutuhkan waktu untuk terurai secara alami?",
-      image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400"
+      description:
+        "Berapa lama sampah membutuhkan waktu untuk terurai secara alami?",
+      image:
+        "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400",
     },
     {
       id: 2,
       title: "Jenis-jenis Sampah",
       description: "Mengenal kategori sampah dan cara pengelolaannya",
-      image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400"
-    }
+      image:
+        "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400",
+    },
   ];
 
   return (
@@ -107,17 +130,23 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
           <BookOpen className="w-8 h-8 md:w-10 md:h-10" />
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Pusat Edukasi</h1>
-            <p className="text-sm md:text-base text-blue-100">Belajar tentang lingkungan & daur ulang</p>
+            <p className="text-sm md:text-base text-blue-100">
+              Belajar tentang lingkungan & daur ulang
+            </p>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
-            <div className="text-blue-100 text-xs md:text-sm">Total Artikel</div>
+            <div className="text-blue-100 text-xs md:text-sm">
+              Total Artikel
+            </div>
             <div className="text-lg md:text-2xl font-bold">50+</div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
-            <div className="text-blue-100 text-xs md:text-sm">Video Tutorial</div>
+            <div className="text-blue-100 text-xs md:text-sm">
+              Video Tutorial
+            </div>
             <div className="text-lg md:text-2xl font-bold">25+</div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
@@ -129,32 +158,83 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
 
       {/* Tabs */}
       <Tabs defaultValue="articles" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-white rounded-2xl p-2 shadow-lg">
-          <TabsTrigger value="articles" className="rounded-xl">Artikel</TabsTrigger>
-          <TabsTrigger value="videos" className="rounded-xl">Video</TabsTrigger>
-          <TabsTrigger value="infographics" className="rounded-xl">Infografis</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white rounded-2xl p-1 md:p-2 shadow-lg h-auto">
+          <TabsTrigger
+            value="articles"
+            className="rounded-xl flex flex-col md:flex-row items-center gap-1 md:gap-2 py-4 md:py-2 px-3 md:px-4 text-xs md:text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white transition-all duration-200"
+          >
+            <FileText
+              size={20}
+              className="md:w-4 md:h-4 text-gray-500 data-[state=active]:text-white"
+            />
+            <span className="text-center text-gray-600 data-[state=active]:text-white font-semibold">
+              Artikel
+            </span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="videos"
+            className="rounded-xl flex flex-col md:flex-row items-center gap-1 md:gap-2 py-4 md:py-2 px-3 md:px-4 text-xs md:text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white transition-all duration-200"
+          >
+            <PlayCircle
+              size={20}
+              className="md:w-4 md:h-4 text-gray-500 data-[state=active]:text-white"
+            />
+            <span className="text-center text-gray-600 data-[state=active]:text-white font-semibold">
+              Video
+            </span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="infographics"
+            className="rounded-xl flex flex-col md:flex-row items-center gap-1 md:gap-2 py-4 md:py-2 px-3 md:px-4 text-xs md:text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-200"
+          >
+            <BarChart3
+              size={20}
+              className="md:w-4 md:h-4 text-gray-500 data-[state=active]:text-white"
+            />
+            <span className="text-center text-gray-600 data-[state=active]:text-white font-semibold">
+              Infografis
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         {/* Articles Tab */}
         <TabsContent value="articles" className="space-y-4 mt-6">
           {articles.map((article) => (
-            <Card key={article.id} className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+            <Card
+              key={article.id}
+              className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            >
               <div className="flex gap-4">
-                <div className={`${article.color} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}>
+                <div
+                  className={`${article.color} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}
+                >
                   {article.icon}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <Badge variant="secondary" className="mb-2">{article.category}</Badge>
-                      <h3 className="font-bold text-gray-900">{article.title}</h3>
+                      <Badge variant="secondary" className="mb-2">
+                        {article.category}
+                      </Badge>
+                      <h3 className="font-bold text-gray-900">
+                        {article.title}
+                      </h3>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm mb-3">{article.description}</p>
+                  <p className="text-gray-600 text-sm mb-3">
+                    {article.description}
+                  </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">⏱ {article.readTime}</span>
-                    <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">
-                      Baca Selengkapnya <ExternalLink className="w-4 h-4 ml-2" />
+                    <span className="text-xs text-gray-500">
+                      ⏱ {article.readTime}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      Baca Selengkapnya{" "}
+                      <ExternalLink className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
                 </div>
@@ -171,10 +251,13 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
         <TabsContent value="videos" className="space-y-4 mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {videos.map((video) => (
-              <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <Card
+                key={video.id}
+                className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              >
                 <div className="relative">
-                  <img 
-                    src={video.thumbnail} 
+                  <img
+                    src={video.thumbnail}
                     alt={video.title}
                     className="w-full h-48 object-cover"
                   />
@@ -188,7 +271,9 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">{video.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-2">
+                    {video.title}
+                  </h3>
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span>{video.views} views</span>
                     <Badge variant="secondary">Tutorial</Badge>
@@ -207,15 +292,22 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
         <TabsContent value="infographics" className="space-y-4 mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {infographics.map((infographic) => (
-              <Card key={infographic.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                <img 
-                  src={infographic.image} 
+              <Card
+                key={infographic.id}
+                className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              >
+                <img
+                  src={infographic.image}
                   alt={infographic.title}
                   className="w-full h-64 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">{infographic.title}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{infographic.description}</p>
+                  <h3 className="font-bold text-gray-900 mb-2">
+                    {infographic.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {infographic.description}
+                  </p>
                   <Button variant="outline" size="sm" className="w-full">
                     <Info className="w-4 h-4 mr-2" />
                     Pelajari Lebih Lanjut
@@ -240,10 +332,15 @@ export function EducationView({ onBack }: EducationViewProps = {}) {
           <div className="flex-1">
             <h3 className="font-bold text-gray-900 mb-2">💡 Tips Hari Ini</h3>
             <p className="text-gray-700 mb-3">
-              Gunakan tas belanja yang dapat digunakan kembali untuk mengurangi penggunaan kantong plastik. 
-              Satu tas kain dapat menggantikan hingga 1000 kantong plastik!
+              Gunakan tas belanja yang dapat digunakan kembali untuk mengurangi
+              penggunaan kantong plastik. Satu tas kain dapat menggantikan
+              hingga 1000 kantong plastik!
             </p>
-            <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-50">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-green-600 text-green-600 hover:bg-green-50"
+            >
               Bagikan Tips Ini
             </Button>
           </div>

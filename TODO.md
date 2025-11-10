@@ -1,20 +1,18 @@
-# TODO: Implement Live Camera Preview in QR Scanner Modal
+# TODO: Add Crop Photo Feature for Profile Upload
 
-## Steps to Complete
+## Tasks
 
-- [x] Add state for video stream in QRScannerModal.tsx
-- [x] Modify startCamera function to get camera stream using navigator.mediaDevices.getUserMedia
-- [x] Add video element in the scanning UI to display live camera feed
-- [x] Style the video element with overlays for scanning instructions (e.g., frame, text)
-- [x] Update stopCamera function to stop video stream
-- [x] Handle camera access errors gracefully
-- [x] Replace BarcodeScanner plugin with web-based QR scanning using html5-qrcode library
-- [x] Install html5-qrcode library
-- [x] Update scanning logic to use html5-qrcode for both preview and scanning
-- [x] Add camera permissions to AndroidManifest.xml for Android 12+ compatibility
-- [x] Update Capacitor config with camera permissions
-- [x] Sync Capacitor plugins
-- [x] Replace html5-qrcode with jsQR for better Android compatibility
-- [x] Implement custom QR scanning using jsQR library
-- [x] Build and sync APK
-- [ ] Test the implementation on a device to ensure camera preview works
+- [x] Install react-easy-crop library
+- [x] Modify EditProfileModal.tsx to include cropping functionality
+  - [x] Add state for crop mode and cropped image
+  - [x] Implement crop UI with 1:1 aspect ratio
+  - [x] Add crop confirmation and cancel buttons
+  - [x] Integrate cropped image into form data
+- [x] Test the cropping feature (dev server running at http://localhost:3000)
+- [ ] Update any related components if needed
+
+## Notes
+
+- Use react-easy-crop for cropping functionality
+- Enforce 1:1 aspect ratio for profile photos
+- Ensure mobile-friendly implementation

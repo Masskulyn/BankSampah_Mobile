@@ -1,20 +1,38 @@
-import { Home, Trash2, Gift, BookOpen, User, Menu, X } from "lucide-react";
+import {
+  Home,
+  Trash2,
+  Gift,
+  BookOpen,
+  User,
+  Menu,
+  X,
+  Wallet,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 
 interface TopNavigationProps {
   activeView: string;
   onViewChange: (view: string) => void;
+  balance?: number;
 }
 
-export function TopNavigation({ activeView, onViewChange }: TopNavigationProps) {
+export function TopNavigation({
+  activeView,
+  onViewChange,
+  balance,
+}: TopNavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuItems = [
     { id: "home", label: "Beranda", icon: <Home className="w-5 h-5" /> },
     { id: "deposit", label: "Setor", icon: <Trash2 className="w-5 h-5" /> },
     { id: "rewards", label: "Tukar Poin", icon: <Gift className="w-5 h-5" /> },
-    { id: "education", label: "Edukasi", icon: <BookOpen className="w-5 h-5" /> },
+    {
+      id: "education",
+      label: "Edukasi",
+      icon: <BookOpen className="w-5 h-5" />,
+    },
   ];
 
   return (
@@ -36,6 +54,14 @@ export function TopNavigation({ activeView, onViewChange }: TopNavigationProps) 
             <span>{item.label}</span>
           </Button>
         ))}
+
+        {/* Balance Display */}
+        {balance !== undefined && (
+          <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-2 text-sm font-semibold text-gray-800 bg-green-50 px-3 py-1.5 rounded-lg">
+            <Wallet size={16} className="text-green-600" />
+            <span>Rp {balance.toLocaleString("id-ID")}</span>
+          </div>
+        )}
       </nav>
 
       {/* Mobile/Tablet Navigation */}
@@ -46,12 +72,26 @@ export function TopNavigation({ activeView, onViewChange }: TopNavigationProps) 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="rounded-2xl"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </Button>
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-50 animate-in slide-in-from-top duration-200">
+            {/* Balance Display for Mobile */}
+            {balance !== undefined && (
+              <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 shadow-sm">
+                <div className="flex items-center gap-3 text-base font-bold text-green-800">
+                  <Wallet size={20} className="text-green-600" />
+                  <span>Saldo: Rp {balance.toLocaleString("id-ID")}</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               {menuItems.map((item) => (
                 <Button

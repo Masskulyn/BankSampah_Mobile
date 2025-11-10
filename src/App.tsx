@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  AuthProvider,
-  useAuth,
-} from "./components/AuthContext";
+import { AuthProvider, useAuth } from "./components/AuthContext";
 import { AuthScreen } from "./components/AuthScreen";
 import { SplashScreen } from "./components/SplashScreen";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
@@ -34,7 +31,7 @@ import { DepositView } from "./components/DepositView";
 import { NotificationPanel } from "./components/NotificationPanel";
 import { Bell, LogOut } from "lucide-react";
 import { Button } from "./components/ui/button";
-import { Avatar, AvatarFallback } from "./components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { toast } from "sonner@2.0.3";
 import { mockTransactions } from "./data/mockTransactions";
 import { mockNews } from "./data/mockNews";
@@ -42,24 +39,19 @@ import { loadAllArticles, incrementArticleViews } from "./utils/articleHelpers";
 import "./data/demoUsers"; // Initialize demo users
 
 function MainApp() {
-  const { user, isAuthenticated, logout, updateUser } =
-    useAuth();
+  const { user, isAuthenticated, logout, updateUser } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState("home");
   const [currentView, setCurrentView] = useState("home");
   const [topNavView, setTopNavView] = useState("home");
-  const [selectedArticleId, setSelectedArticleId] = useState<
-    string | null
-  >(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(
+    null
+  );
   const [showChatSupport, setShowChatSupport] = useState(false);
-  const [showCashOutModal, setShowCashOutModal] =
-    useState(false);
-  const [showQRScannerModal, setShowQRScannerModal] =
-    useState(false);
-  const [showReminderModal, setShowReminderModal] =
-    useState(false);
-  const [showNotifications, setShowNotifications] = 
-    useState(false);
+  const [showCashOutModal, setShowCashOutModal] = useState(false);
+  const [showQRScannerModal, setShowQRScannerModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [allArticles, setAllArticles] = useState(() => loadAllArticles());
 
   // Reload articles when component mounts or when returning from certain views
@@ -69,8 +61,7 @@ function MainApp() {
 
   // Show splash screen on first load
   useEffect(() => {
-    const hasSeenSplash =
-      sessionStorage.getItem("hasSeenSplash");
+    const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
     if (hasSeenSplash) {
       setShowSplash(false);
     }
@@ -117,7 +108,7 @@ function MainApp() {
   const handleCashOutSuccess = (amount: number) => {
     updateUser({ balance: user.balance - amount });
     toast.success(
-      `Penarikan Rp ${amount.toLocaleString("id-ID")} berhasil diproses`,
+      `Penarikan Rp ${amount.toLocaleString("id-ID")} berhasil diproses`
     );
   };
 
@@ -145,7 +136,7 @@ function MainApp() {
     // Process QR code data from admin
     // Support both old format (single waste) and new format (multi waste)
     const isMultiWaste = data.wasteItems && Array.isArray(data.wasteItems);
-    
+
     if (data.type === "deposit") {
       let totalAmount = 0;
       let totalWeight = 0;
@@ -154,10 +145,13 @@ function MainApp() {
       if (isMultiWaste) {
         // New format with multiple waste items
         totalAmount = data.totalAmount;
-        totalWeight = data.wasteItems.reduce((sum: number, item: any) => sum + item.wasteWeight, 0);
-        description = data.wasteItems.map((item: any) => 
-          `${item.wasteWeight} kg ${item.wasteType}`
-        ).join(', ');
+        totalWeight = data.wasteItems.reduce(
+          (sum: number, item: any) => sum + item.wasteWeight,
+          0
+        );
+        description = data.wasteItems
+          .map((item: any) => `${item.wasteWeight} kg ${item.wasteType}`)
+          .join(", ");
       } else {
         // Old format with single waste item (backward compatibility)
         totalAmount = data.amount;
@@ -185,30 +179,32 @@ function MainApp() {
         date: new Date().toISOString(),
         status: "completed",
         description: `Setoran sampah - ${description}`,
-        wasteItems: isMultiWaste ? data.wasteItems : [{
-          wasteType: data.wasteType,
-          wasteWeight: data.wasteWeight,
-          pricePerKg: totalAmount / totalWeight,
-          amount: totalAmount
-        }],
+        wasteItems: isMultiWaste
+          ? data.wasteItems
+          : [
+              {
+                wasteType: data.wasteType,
+                wasteWeight: data.wasteWeight,
+                pricePerKg: totalAmount / totalWeight,
+                amount: totalAmount,
+              },
+            ],
         totalWeight: totalWeight,
       };
 
-      const transactionsData = localStorage.getItem(
-        "ecobank_transactions",
-      );
-      const transactions = transactionsData
-        ? JSON.parse(transactionsData)
-        : [];
+      const transactionsData = localStorage.getItem("ecobank_transactions");
+      const transactions = transactionsData ? JSON.parse(transactionsData) : [];
       transactions.push(transaction);
       localStorage.setItem(
         "ecobank_transactions",
-        JSON.stringify(transactions),
+        JSON.stringify(transactions)
       );
 
       toast.success(
-        `Setoran berhasil! +Rp ${totalAmount.toLocaleString("id-ID")} (${totalWeight.toFixed(1)} kg)`,
-        { duration: 5000 },
+        `Setoran berhasil! +Rp ${totalAmount.toLocaleString(
+          "id-ID"
+        )} (${totalWeight.toFixed(1)} kg)`,
+        { duration: 5000 }
       );
     } else {
       toast.success("QR Code berhasil dipindai!");
@@ -224,7 +220,7 @@ function MainApp() {
     };
 
     toast.success(
-      `Pengingat "${reminderTypes[reminderData.type]}" berhasil diatur!`,
+      `Pengingat "${reminderTypes[reminderData.type]}" berhasil diatur!`
     );
   };
 
@@ -258,12 +254,10 @@ function MainApp() {
   const handleAddressSelect = (address: any) => {
     if (address.id?.startsWith("unis-")) {
       toast.success(
-        `📍 UNIS Tangerang - ${address.name} dipilih! Mengarahkan ke Google Maps...`,
+        `📍 UNIS Tangerang - ${address.name} dipilih! Mengarahkan ke Google Maps...`
       );
     } else {
-      toast.success(
-        `📍 Lokasi "${address.name}" dipilih. Navigasi dimulai!`,
-      );
+      toast.success(`📍 Lokasi "${address.name}" dipilih. Navigasi dimulai!`);
     }
     // Here you could integrate with maps API or navigation
   };
@@ -287,9 +281,7 @@ function MainApp() {
         onReminder={handleReminder}
       />
 
-      <LeaderboardCard
-        onViewAll={() => setTopNavView("leaderboard")}
-      />
+      <LeaderboardCard onViewAll={() => setTopNavView("leaderboard")} />
 
       <TransactionHistory
         transactions={recentTransactions}
@@ -323,21 +315,15 @@ function MainApp() {
     }
 
     if (topNavView === "rewards") {
-      return (
-        <RewardsView onBack={() => setTopNavView("home")} />
-      );
+      return <RewardsView onBack={() => setTopNavView("home")} />;
     }
 
     if (topNavView === "education") {
-      return (
-        <EducationView onBack={() => setTopNavView("home")} />
-      );
+      return <EducationView onBack={() => setTopNavView("home")} />;
     }
 
     if (topNavView === "leaderboard") {
-      return (
-        <LeaderboardView onBack={() => setTopNavView("home")} />
-      );
+      return <LeaderboardView onBack={() => setTopNavView("home")} />;
     }
 
     // Handle specific views
@@ -362,7 +348,7 @@ function MainApp() {
 
     if (currentView === "article" && selectedArticleId) {
       const selectedArticle = allArticles.find(
-        (article) => article.id === selectedArticleId,
+        (article) => article.id === selectedArticleId
       );
       if (selectedArticle) {
         return (
@@ -391,10 +377,7 @@ function MainApp() {
         );
       case "profile":
         return (
-          <ProfileView
-            userData={userData}
-            onChatSupport={handleChatSupport}
-          />
+          <ProfileView userData={userData} onChatSupport={handleChatSupport} />
         );
       default:
         return renderHomeContent();
@@ -415,6 +398,7 @@ function MainApp() {
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="relative">
                   <Avatar className="w-10 h-10 md:w-12 md:h-12 ring-2 ring-green-500/20 ring-offset-2">
+                    <AvatarImage src={user.profileImage} alt={userData.name} />
                     <AvatarFallback className="bg-gradient-to-br from-green-500 to-emerald-600 text-white font-bold text-sm md:text-base">
                       {userData.name
                         .split(" ")
@@ -432,6 +416,11 @@ function MainApp() {
                     {userData.name}
                   </p>
                 </div>
+                <div className="sm:hidden">
+                  <p className="text-gray-800 font-semibold text-sm">
+                    {userData.name}
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center gap-1 md:gap-2">
@@ -442,6 +431,7 @@ function MainApp() {
                     setActiveTab("home"); // Reset bottom nav when using top nav
                     setCurrentView("home");
                   }}
+                  balance={userData.balance}
                 />
 
                 <Button
@@ -450,14 +440,8 @@ function MainApp() {
                   onClick={() => setShowNotifications(!showNotifications)}
                   className="relative p-2 md:p-3 hover:bg-gray-100 rounded-xl md:rounded-2xl transition-all duration-200 hover:scale-105"
                 >
-                  <Bell
-                    size={18}
-                    className="md:hidden text-gray-600"
-                  />
-                  <Bell
-                    size={22}
-                    className="hidden md:block text-gray-600"
-                  />
+                  <Bell size={18} className="md:hidden text-gray-600" />
+                  <Bell size={22} className="hidden md:block text-gray-600" />
                   <span className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 w-3 h-3 md:w-4 md:h-4 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg flex items-center justify-center">
                     <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full"></span>
                   </span>
@@ -471,19 +455,14 @@ function MainApp() {
                   title="Keluar"
                 >
                   <LogOut size={16} className="md:hidden" />
-                  <LogOut
-                    size={20}
-                    className="hidden md:block"
-                  />
+                  <LogOut size={20} className="hidden md:block" />
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="p-4 md:p-6 pb-24">
-            {renderContent()}
-          </div>
+          <div className="p-4 md:p-6 pb-24">{renderContent()}</div>
 
           {/* Footer */}
           <Footer />

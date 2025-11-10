@@ -12,17 +12,17 @@ import { HelpCenterModal } from "./HelpCenterModal";
 import { TermsModal } from "./TermsModal";
 import { LanguageModal } from "./LanguageModal";
 import { useAuth } from "./AuthContext";
-import { 
-  User, 
-  Edit, 
-  Bell, 
-  Shield, 
-  CreditCard, 
-  HelpCircle, 
-  Settings, 
-  Phone, 
-  Mail, 
-  MapPin, 
+import {
+  User,
+  Edit,
+  Bell,
+  Shield,
+  CreditCard,
+  HelpCircle,
+  Settings,
+  Phone,
+  Mail,
+  MapPin,
   Calendar,
   Award,
   Leaf,
@@ -39,7 +39,7 @@ import {
   Globe,
   FileText,
   MessageCircle,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner@2.0.3";
@@ -60,11 +60,11 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
     deposit: true,
     cashout: true,
     news: false,
-    promo: true
+    promo: true,
   });
 
   const [showBalance, setShowBalance] = useState(true);
-  
+
   // Modal States
   const [showEditContact, setShowEditContact] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -79,7 +79,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
   const [contactData, setContactData] = useState({
     phone: user?.phone || "+62 812-3456-7890",
     email: user?.email || "user@ecobank.id",
-    address: `${user?.city || "Jakarta Selatan"}, DKI Jakarta`
+    address: `${user?.city || "Jakarta Selatan"}, DKI Jakarta`,
   });
 
   // Profile Data
@@ -88,12 +88,15 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
     birthDate: "1995-06-15",
     gender: "male",
     occupation: "Software Engineer",
-    city: user?.city || "Jakarta Selatan"
+    city: user?.city || "Jakarta Selatan",
+    profileImage: user?.profileImage || "",
   });
 
   const handleNotificationChange = (type: string, value: boolean) => {
-    setNotifications(prev => ({ ...prev, [type]: value }));
-    toast.success(`Notifikasi ${type} ${value ? 'diaktifkan' : 'dinonaktifkan'}`);
+    setNotifications((prev) => ({ ...prev, [type]: value }));
+    toast.success(
+      `Notifikasi ${type} ${value ? "diaktifkan" : "dinonaktifkan"}`
+    );
   };
 
   const handleEditProfile = () => {
@@ -113,7 +116,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
     // Update user in auth context
     updateUser({
       phone: data.phone,
-      email: data.email
+      email: data.email,
     });
   };
 
@@ -122,7 +125,8 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
     // Update user in auth context
     updateUser({
       name: data.name,
-      city: data.city
+      city: data.city,
+      profileImage: data.profileImage,
     });
   };
 
@@ -133,7 +137,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
     rankPosition: 12,
     totalTransactions: 42,
     carbonSaved: 15.6, // kg CO2
-    treesEquivalent: 3
+    treesEquivalent: 3,
   };
 
   const menuItems = [
@@ -146,15 +150,15 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Edit data pribadi Anda",
           action: () => setShowEditProfile(true),
           color: "text-blue-600",
-          bgColor: "bg-blue-100"
+          bgColor: "bg-blue-100",
         },
         {
           icon: Shield,
           title: "Keamanan & Privasi",
           subtitle: "PIN, Password, dan keamanan akun",
           action: () => setShowSecurity(true),
-          color: "text-green-600", 
-          bgColor: "bg-green-100"
+          color: "text-green-600",
+          bgColor: "bg-green-100",
         },
         {
           icon: CreditCard,
@@ -162,9 +166,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Kelola rekening untuk pencairan",
           action: () => setShowBankAccount(true),
           color: "text-purple-600",
-          bgColor: "bg-purple-100"
-        }
-      ]
+          bgColor: "bg-purple-100",
+        },
+      ],
     },
     {
       category: "Preferensi",
@@ -175,7 +179,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Atur notifikasi aplikasi",
           action: null, // Will be handled differently
           color: "text-orange-600",
-          bgColor: "bg-orange-100"
+          bgColor: "bg-orange-100",
         },
         {
           icon: Globe,
@@ -183,9 +187,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Indonesia • Jakarta",
           action: () => setShowLanguage(true),
           color: "text-indigo-600",
-          bgColor: "bg-indigo-100"
-        }
-      ]
+          bgColor: "bg-indigo-100",
+        },
+      ],
     },
     {
       category: "Bantuan",
@@ -196,7 +200,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "FAQ dan panduan penggunaan",
           action: () => setShowHelpCenter(true),
           color: "text-cyan-600",
-          bgColor: "bg-cyan-100"
+          bgColor: "bg-cyan-100",
         },
         {
           icon: MessageCircle,
@@ -204,7 +208,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Live chat dengan customer service",
           action: () => onChatSupport?.(),
           color: "text-pink-600",
-          bgColor: "bg-pink-100"
+          bgColor: "bg-pink-100",
         },
         {
           icon: FileText,
@@ -212,10 +216,10 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           subtitle: "Kebijakan dan aturan penggunaan",
           action: () => setShowTerms(true),
           color: "text-gray-600",
-          bgColor: "bg-gray-100"
-        }
-      ]
-    }
+          bgColor: "bg-gray-100",
+        },
+      ],
+    },
   ];
 
   return (
@@ -227,12 +231,19 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Avatar className="w-20 h-20 ring-4 ring-white/30">
+                  <AvatarImage
+                    src={profileData.profileImage}
+                    alt={userData.name}
+                  />
                   <AvatarFallback className="bg-white/20 text-white text-xl font-bold backdrop-blur-sm">
-                    {userData.name.split(" ").map(n => n[0]).join("")}
+                    {userData.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <Button 
-                  size="icon" 
+                <Button
+                  size="icon"
                   onClick={handleChangePhoto}
                   className="absolute -bottom-2 -right-2 w-8 h-8 bg-white/90 hover:bg-white text-green-600 rounded-full shadow-lg"
                 >
@@ -240,7 +251,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                 </Button>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-1">{user?.name || userData.name}</h3>
+                <h3 className="text-xl font-bold mb-1">
+                  {user?.name || userData.name}
+                </h3>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
                     <Award size={12} className="mr-1" />
@@ -251,15 +264,18 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                   </Badge>
                 </div>
                 <p className="text-white/80 text-sm">
-                Member sejak {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('id-ID', { 
-                  month: 'long', 
-                  year: 'numeric' 
-                }) : 'Januari 2024'}
-              </p>
+                  Member sejak{" "}
+                  {user?.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString("id-ID", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "Januari 2024"}
+                </p>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={handleEditProfile}
               className="text-white/80 hover:text-white hover:bg-white/20"
@@ -273,7 +289,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             <div className="text-center">
               <div className="flex items-center justify-center mb-1">
                 <p className="text-2xl font-bold">
-                  {showBalance ? `${Math.floor(userData.balance / 1000)}k` : "•••"}
+                  {showBalance
+                    ? `${Math.floor(userData.balance / 1000)}k`
+                    : "•••"}
                 </p>
                 <Button
                   variant="ghost"
@@ -304,7 +322,10 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
               <Leaf className="text-green-600" size={16} />
               Dampak Lingkungan
             </h4>
-            <Badge variant="outline" className="text-green-600 border-green-200">
+            <Badge
+              variant="outline"
+              className="text-green-600 border-green-200"
+            >
               <Star size={12} className="mr-1" />
               Hebat!
             </Badge>
@@ -313,14 +334,18 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             <div className="p-3 bg-green-50 rounded-xl">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Recycle className="text-green-600" size={14} />
-                <p className="font-bold text-green-800">{userStats.carbonSaved} kg</p>
+                <p className="font-bold text-green-800">
+                  {userStats.carbonSaved} kg
+                </p>
               </div>
               <p className="text-xs text-green-600">CO₂ Tersimpan</p>
             </div>
             <div className="p-3 bg-blue-50 rounded-xl">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Leaf className="text-blue-600" size={14} />
-                <p className="font-bold text-blue-800">{userStats.treesEquivalent} pohon</p>
+                <p className="font-bold text-blue-800">
+                  {userStats.treesEquivalent} pohon
+                </p>
               </div>
               <p className="text-xs text-blue-600">Setara Menanam</p>
             </div>
@@ -337,7 +362,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div 
+          <div
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
             onClick={() => setShowEditContact(true)}
           >
@@ -350,7 +375,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             </div>
             <ChevronRight size={16} className="text-gray-400" />
           </div>
-          <div 
+          <div
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
             onClick={() => setShowEditContact(true)}
           >
@@ -363,7 +388,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             </div>
             <ChevronRight size={16} className="text-gray-400" />
           </div>
-          <div 
+          <div
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
             onClick={() => setShowEditContact(true)}
           >
@@ -399,47 +424,63 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                         <p className="text-sm text-gray-500">{item.subtitle}</p>
                       </div>
                     </div>
-                    
+
                     {/* Notification Settings */}
                     <div className="ml-14 space-y-3 pb-2">
                       <div className="flex items-center justify-between py-2">
                         <div>
                           <p className="text-sm font-medium">Setor Sampah</p>
-                          <p className="text-xs text-gray-500">Pengingat jadwal setor</p>
+                          <p className="text-xs text-gray-500">
+                            Pengingat jadwal setor
+                          </p>
                         </div>
-                        <Switch 
+                        <Switch
                           checked={notifications.deposit}
-                          onCheckedChange={(value) => handleNotificationChange('deposit', value)}
+                          onCheckedChange={(value) =>
+                            handleNotificationChange("deposit", value)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between py-2">
                         <div>
                           <p className="text-sm font-medium">Penarikan Saldo</p>
-                          <p className="text-xs text-gray-500">Konfirmasi pencairan</p>
+                          <p className="text-xs text-gray-500">
+                            Konfirmasi pencairan
+                          </p>
                         </div>
-                        <Switch 
+                        <Switch
                           checked={notifications.cashout}
-                          onCheckedChange={(value) => handleNotificationChange('cashout', value)}
+                          onCheckedChange={(value) =>
+                            handleNotificationChange("cashout", value)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between py-2">
                         <div>
                           <p className="text-sm font-medium">Berita & Tips</p>
-                          <p className="text-xs text-gray-500">Update artikel terbaru</p>
+                          <p className="text-xs text-gray-500">
+                            Update artikel terbaru
+                          </p>
                         </div>
-                        <Switch 
+                        <Switch
                           checked={notifications.news}
-                          onCheckedChange={(value) => handleNotificationChange('news', value)}
+                          onCheckedChange={(value) =>
+                            handleNotificationChange("news", value)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between py-2">
                         <div>
                           <p className="text-sm font-medium">Promo & Reward</p>
-                          <p className="text-xs text-gray-500">Penawaran khusus</p>
+                          <p className="text-xs text-gray-500">
+                            Penawaran khusus
+                          </p>
                         </div>
-                        <Switch 
+                        <Switch
                           checked={notifications.promo}
-                          onCheckedChange={(value) => handleNotificationChange('promo', value)}
+                          onCheckedChange={(value) =>
+                            handleNotificationChange("promo", value)
+                          }
                         />
                       </div>
                     </div>
@@ -459,7 +500,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                     <ChevronRight size={16} className="text-gray-400" />
                   </button>
                 )}
-                {itemIndex < section.items.length - 1 && <Separator className="my-2" />}
+                {itemIndex < section.items.length - 1 && (
+                  <Separator className="my-2" />
+                )}
               </div>
             ))}
           </CardContent>
@@ -496,12 +539,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
         onClose={() => setShowHelpCenter(false)}
       />
 
-
-
-      <TermsModal
-        isOpen={showTerms}
-        onClose={() => setShowTerms(false)}
-      />
+      <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
 
       <LanguageModal
         isOpen={showLanguage}
@@ -516,7 +554,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
               <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
                 <Recycle size={16} className="text-white" />
               </div>
-              <span className="font-semibold text-gray-900">EcoBank v2.1.0</span>
+              <span className="font-semibold text-gray-900">
+                EcoBank v2.1.0
+              </span>
             </div>
             <p className="text-xs text-gray-500">© 2024 EcoBank Indonesia</p>
             <p className="text-xs text-gray-400">
@@ -529,9 +569,9 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
       {/* Logout Button */}
       <Card className="border-red-200 bg-red-50/50">
         <CardContent className="p-4">
-          <Button 
+          <Button
             onClick={handleLogout}
-            variant="ghost" 
+            variant="ghost"
             className="w-full justify-center gap-2 text-red-600 hover:bg-red-100 hover:text-red-700"
           >
             <LogOut size={16} />

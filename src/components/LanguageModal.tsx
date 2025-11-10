@@ -38,43 +38,15 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
       name: "Bahasa Indonesia",
       nativeName: "Bahasa Indonesia",
       flag: "🇮🇩",
-      isAvailable: true
+      isAvailable: true,
     },
     {
       code: "en",
       name: "English",
       nativeName: "English",
       flag: "🇺🇸",
-      isAvailable: true
+      isAvailable: true,
     },
-    {
-      code: "ms",
-      name: "Bahasa Melayu",
-      nativeName: "Bahasa Melayu",
-      flag: "🇲🇾",
-      isAvailable: false
-    },
-    {
-      code: "th",
-      name: "Thai",
-      nativeName: "ภาษาไทย",
-      flag: "🇹🇭",
-      isAvailable: false
-    },
-    {
-      code: "vi",
-      name: "Vietnamese",
-      nativeName: "Tiếng Việt",
-      flag: "🇻🇳",
-      isAvailable: false
-    },
-    {
-      code: "zh",
-      name: "Chinese",
-      nativeName: "中文",
-      flag: "🇨🇳",
-      isAvailable: false
-    }
   ];
 
   const regions: Region[] = [
@@ -83,39 +55,22 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
       name: "Indonesia",
       timezone: "WIB (UTC+7)",
       currency: "IDR (Rupiah)",
-      flag: "🇮🇩"
+      flag: "🇮🇩",
     },
-    {
-      code: "sg",
-      name: "Singapore",
-      timezone: "SGT (UTC+8)",
-      currency: "SGD (Dollar)",
-      flag: "🇸🇬"
-    },
-    {
-      code: "my",
-      name: "Malaysia", 
-      timezone: "MYT (UTC+8)",
-      currency: "MYR (Ringgit)",
-      flag: "🇲🇾"
-    },
-    {
-      code: "th",
-      name: "Thailand",
-      timezone: "ICT (UTC+7)",
-      currency: "THB (Baht)",
-      flag: "🇹🇭"
-    }
   ];
 
   const handleSave = async () => {
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
-      const languageName = languages.find(lang => lang.code === selectedLanguage)?.name;
-      const regionName = regions.find(reg => reg.code === selectedRegion)?.name;
-      
+      const languageName = languages.find(
+        (lang) => lang.code === selectedLanguage
+      )?.name;
+      const regionName = regions.find(
+        (reg) => reg.code === selectedRegion
+      )?.name;
+
       setIsLoading(false);
       onClose();
       toast.success(`Bahasa diubah ke ${languageName}, Region: ${regionName}`);
@@ -141,22 +96,30 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
             </h3>
             <div className="space-y-2">
               {languages.map((language) => (
-                <Card 
+                <Card
                   key={language.code}
                   className={`cursor-pointer transition-all ${
-                    selectedLanguage === language.code 
-                      ? 'ring-2 ring-indigo-500 bg-indigo-50' 
-                      : 'hover:bg-gray-50'
-                  } ${!language.isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={() => language.isAvailable && setSelectedLanguage(language.code)}
+                    selectedLanguage === language.code
+                      ? "ring-2 ring-indigo-500 bg-indigo-50"
+                      : "hover:bg-gray-50"
+                  } ${
+                    !language.isAvailable ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() =>
+                    language.isAvailable && setSelectedLanguage(language.code)
+                  }
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{language.flag}</span>
                         <div>
-                          <p className="font-medium text-gray-900">{language.name}</p>
-                          <p className="text-sm text-gray-500">{language.nativeName}</p>
+                          <p className="font-medium text-gray-900">
+                            {language.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {language.nativeName}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -165,11 +128,12 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
                             Segera Hadir
                           </Badge>
                         )}
-                        {selectedLanguage === language.code && language.isAvailable && (
-                          <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
-                            <Check size={14} className="text-white" />
-                          </div>
-                        )}
+                        {selectedLanguage === language.code &&
+                          language.isAvailable && (
+                            <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
+                              <Check size={14} className="text-white" />
+                            </div>
+                          )}
                       </div>
                     </div>
                   </CardContent>
@@ -186,12 +150,12 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
             </h3>
             <div className="space-y-2">
               {regions.map((region) => (
-                <Card 
+                <Card
                   key={region.code}
                   className={`cursor-pointer transition-all ${
-                    selectedRegion === region.code 
-                      ? 'ring-2 ring-purple-500 bg-purple-50' 
-                      : 'hover:bg-gray-50'
+                    selectedRegion === region.code
+                      ? "ring-2 ring-purple-500 bg-purple-50"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => setSelectedRegion(region.code)}
                 >
@@ -200,7 +164,9 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{region.flag}</span>
                         <div>
-                          <p className="font-medium text-gray-900">{region.name}</p>
+                          <p className="font-medium text-gray-900">
+                            {region.name}
+                          </p>
                           <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
                             <div className="flex items-center gap-1">
                               <Clock size={10} />
@@ -228,30 +194,41 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
           {/* Current Settings Info */}
           <Card className="bg-blue-50 border-blue-200">
             <CardContent className="p-4">
-              <h4 className="font-semibold text-blue-900 mb-3">Pengaturan Saat Ini</h4>
+              <h4 className="font-semibold text-blue-900 mb-3">
+                Pengaturan Saat Ini
+              </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-blue-700">Bahasa:</span>
                   <span className="font-medium text-blue-900">
-                    {languages.find(lang => lang.code === selectedLanguage)?.name}
+                    {
+                      languages.find((lang) => lang.code === selectedLanguage)
+                        ?.name
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Region:</span>
                   <span className="font-medium text-blue-900">
-                    {regions.find(reg => reg.code === selectedRegion)?.name}
+                    {regions.find((reg) => reg.code === selectedRegion)?.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Zona Waktu:</span>
                   <span className="font-medium text-blue-900">
-                    {regions.find(reg => reg.code === selectedRegion)?.timezone}
+                    {
+                      regions.find((reg) => reg.code === selectedRegion)
+                        ?.timezone
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Mata Uang:</span>
                   <span className="font-medium text-blue-900">
-                    {regions.find(reg => reg.code === selectedRegion)?.currency}
+                    {
+                      regions.find((reg) => reg.code === selectedRegion)
+                        ?.currency
+                    }
                   </span>
                 </div>
               </div>
@@ -261,7 +238,8 @@ export function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
           {/* Info */}
           <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
             <p className="text-sm text-yellow-800">
-              💡 Perubahan bahasa akan mempengaruhi seluruh aplikasi. Beberapa konten mungkin membutuhkan restart aplikasi.
+              💡 Perubahan bahasa akan mempengaruhi seluruh aplikasi. Beberapa
+              konten mungkin membutuhkan restart aplikasi.
             </p>
           </div>
 
