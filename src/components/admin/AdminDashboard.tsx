@@ -7,6 +7,7 @@ import { QRCodeGenerator } from "./QRCodeGenerator";
 import { UserManagement } from "./UserManagement";
 import { AdminTransactions } from "./AdminTransactions";
 import { ArticleManagement } from "./ArticleManagement";
+import { AdminChatView } from "../AdminChatView";
 import { 
   LayoutDashboard, 
   QrCode, 
@@ -14,18 +15,34 @@ import {
   Receipt,
   LogOut,
   Shield,
-  FileText
+  FileText,
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useAuth } from "../AuthContext";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import { useRef } from "react";
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     logout();
     toast.success("Berhasil keluar dari admin panel");
+  };
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabsContainerRef.current) {
+      const scrollAmount = 200;
+      if (direction === 'left') {
+        tabsContainerRef.current.scrollLeft -= scrollAmount;
+      } else {
+        tabsContainerRef.current.scrollLeft += scrollAmount;
+      }
+    }
   };
 
   if (!user || user.role !== 'admin') {
@@ -77,44 +94,92 @@ export function AdminDashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 md:py-6 lg:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 md:space-y-6">
-          {/* Tabs Navigation */}
-          <TabsList className="grid w-full grid-cols-5 bg-white shadow-md p-1 md:p-1.5 h-auto gap-0.5">
-            <TabsTrigger 
-              value="dashboard" 
-              className="flex flex-col items-center gap-1 py-2 px-0.5 min-w-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg"
+          {/* Tabs Navigation - dengan slider untuk mobile */}
+          <div className="relative group">
+            {/* Left Arrow - Mobile only */}
+            <button
+              onClick={() => scrollTabs('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"
+              aria-label="Scroll left"
             >
-              <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm leading-tight truncate w-full px-0.5">Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="qrcode"
-              className="flex flex-col items-center gap-1 py-2 px-0.5 min-w-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg"
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {/* Tabs Container - scrollable on mobile */}
+            <div
+              ref={tabsContainerRef}
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch'
+              }}
             >
-              <QrCode className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm leading-tight truncate w-full px-0.5">QR Code</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="users"
-              className="flex flex-col items-center gap-1 py-2 px-0.5 min-w-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg"
+              <TabsList className="flex bg-white shadow-md p-1 md:p-1.5 h-auto gap-0.5 min-w-max md:min-w-0">
+                <TabsTrigger 
+                  value="dashboard" 
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">Dashboard</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="qrcode"
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <QrCode className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">QR Code</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="users"
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <Users className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">Pengguna</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="transactions"
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <Receipt className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">Transaksi</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="chat"
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">Chat</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="articles"
+                  className="flex items-center gap-1 py-2 px-3 md:px-4 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg flex-shrink-0"
+                >
+                  <FileText className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs md:text-sm">Artikel</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Right Arrow - Mobile only */}
+            <button
+              onClick={() => scrollTabs('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"
+              aria-label="Scroll right"
             >
-              <Users className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm leading-tight truncate w-full px-0.5">Pengguna</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="transactions"
-              className="flex flex-col items-center gap-1 py-2 px-0.5 min-w-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg"
-            >
-              <Receipt className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm leading-tight truncate w-full px-0.5">Transaksi</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="articles"
-              className="flex flex-col items-center gap-1 py-2 px-0.5 min-w-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-lg"
-            >
-              <FileText className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm leading-tight truncate w-full px-0.5">Artikel</span>
-            </TabsTrigger>
-          </TabsList>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Add this CSS for scrollbar hiding */}
+          <style>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+            .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+          `}</style>
 
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-3 md:space-y-6">
@@ -190,6 +255,11 @@ export function AdminDashboard() {
           {/* Transactions Tab */}
           <TabsContent value="transactions" className="space-y-6">
             <AdminTransactions />
+          </TabsContent>
+
+          {/* Chat Tab */}
+          <TabsContent value="chat" className="space-y-6">
+            <AdminChatView onBack={() => setActiveTab("dashboard")} />
           </TabsContent>
 
           {/* Articles Tab */}

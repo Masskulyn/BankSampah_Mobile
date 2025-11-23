@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { useState, useEffect } from "react";
 
 interface LeaderboardUser {
   id: string;
@@ -18,8 +19,91 @@ interface LeaderboardViewProps {
   onBack?: () => void;
 }
 
+interface StoredUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  totalEarnings?: number;
+  wasteDeposited?: number;
+}
+
 export function LeaderboardView({ onBack }: LeaderboardViewProps = {}) {
-  const mockLeaderboard: LeaderboardUser[] = [
+  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
+  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
+  const [currentUserPoints, setCurrentUserPoints] = useState<number>(0);
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, []);
+
+  const loadLeaderboard = () => {
+    try {
+      // Get all registered users from localStorage
+      const usersJson = localStorage.getItem("ecobank_users");
+      const users: StoredUser[] = usersJson ? JSON.parse(usersJson) : [];
+
+      // Get current user from AuthContext or localStorage
+      const currentUserJson = localStorage.getItem("currentUser");
+      const currentUser = currentUserJson ? JSON.parse(currentUserJson) : null;
+
+      // Build leaderboard with user points and stats (excluding admin)
+      const leaderboardData = users
+        .filter(user => user.role !== "admin") // Exclude admin from leaderboard
+        .map((user) => {
+          const userPoints = parseInt(localStorage.getItem(`ecobank_points_${user.id}`) || "0");
+          const userTransactionsJson = localStorage.getItem(`ecobank_transactions_${user.id}`);
+          const userTransactions = userTransactionsJson ? JSON.parse(userTransactionsJson) : [];
+          
+          // Calculate total waste deposited from transactions
+          const totalWaste = userTransactions.reduce((sum: number, tx: any) => {
+            return sum + (tx.amount || 0);
+          }, 0);
+
+          // Assign level based on points (every 1000 points = 1 level, max level 10)
+          const level = Math.min(Math.floor(userPoints / 1000) + 1, 10);
+
+          // Assign badges based on criteria
+          const badges = [];
+          if (totalWaste >= 100) badges.push("eco-warrior");
+          if (userPoints >= 5000) badges.push("consistent");
+          if (userPoints >= 10000) badges.push("top-contributor");
+          if (userPoints >= 500) badges.push("beginner");
+          if (totalWaste >= 500) badges.push("master");
+
+          return {
+            id: user.id,
+            name: user.name,
+            points: userPoints,
+            wasteDeposited: totalWaste,
+            rank: 0, // will be assigned after sorting
+            badges: badges,
+            level: level
+          };
+        });
+
+      // Sort by points descending, then assign ranks
+      leaderboardData.sort((a, b) => b.points - a.points);
+      leaderboardData.forEach((user, index) => {
+        user.rank = index + 1;
+      });
+
+      setLeaderboard(leaderboardData);
+
+      // Find current user's rank and points
+      if (currentUser) {
+        const currentUserInLeaderboard = leaderboardData.find(u => u.id === currentUser.id);
+        if (currentUserInLeaderboard) {
+          setCurrentUserRank(currentUserInLeaderboard.rank);
+          setCurrentUserPoints(currentUserInLeaderboard.points);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading leaderboard:", error);
+    }
+  };
+
+  const mockLeaderboard: LeaderboardUser[] = leaderboard.length > 0 ? leaderboard : [
     {
       id: "1",
       name: "Ahmad Santoso",
@@ -238,34 +322,48 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps = {}) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold text-lg">Progress Anda</h3>
-            <p className="text-green-100 text-sm">Peringkat #42 dari 50,234 pengguna</p>
+            <p className="text-green-100 text-sm">
+              {currentUserRank ? `Peringkat #${currentUserRank} dari ${leaderboard.length} pengguna` : "Login untuk melihat peringkat"}
+            </p>
           </div>
           <Star className="w-8 h-8" />
         </div>
         
         <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
           <div className="flex justify-between text-sm mb-2">
-            <span>7,850 poin</span>
-            <span>Level 5 → Level 6</span>
+            <span>{currentUserPoints.toLocaleString()} poin</span>
+            <span>Level {Math.min(Math.floor(currentUserPoints / 1000) + 1, 10)} → Level {Math.min(Math.floor(currentUserPoints / 1000) + 2, 10)}</span>
           </div>
-          <Progress value={65} className="h-3 bg-white/30" />
+          <Progress 
+            value={Math.min(((currentUserPoints % 1000) / 1000) * 100, 100)} 
+            className="h-3 bg-white/30" 
+          />
           <p className="text-xs text-green-100 mt-2">
-            1,150 poin lagi untuk naik ke Level 6!
+            {1000 - (currentUserPoints % 1000)} poin lagi untuk naik level!
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div className="text-center">
-            <div className="text-2xl font-bold">78 kg</div>
+            <div className="text-2xl font-bold">
+              {leaderboard.find(u => u.id === (JSON.parse(localStorage.getItem("currentUser") || "{}").id))?.wasteDeposited || 0} kg
+            </div>
             <div className="text-xs text-green-100">Sampah Disetor</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">
+              {leaderboard.find(u => u.id === (JSON.parse(localStorage.getItem("currentUser") || "{}").id))?.badges.length || 0}
+            </div>
             <div className="text-xs text-green-100">Badge Didapat</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">14</div>
-            <div className="text-xs text-green-100">Hari Berturut</div>
+            <div className="text-2xl font-bold">
+              {(() => {
+                const transactions = JSON.parse(localStorage.getItem(`ecobank_transactions_${JSON.parse(localStorage.getItem("currentUser") || "{}").id}`) || "[]");
+                return transactions.length;
+              })()}
+            </div>
+            <div className="text-xs text-green-100">Transaksi</div>
           </div>
         </div>
       </div>

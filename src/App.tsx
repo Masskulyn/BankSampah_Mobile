@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import { AuthScreen } from "./components/AuthScreen";
 import { SplashScreen } from "./components/SplashScreen";
@@ -44,6 +45,7 @@ import { mockTransactions } from "./data/mockTransactions";
 import { mockNews } from "./data/mockNews";
 import { loadAllArticles, incrementArticleViews } from "./utils/articleHelpers";
 import "./data/demoUsers"; // Initialize demo users
+import "./utils/setPoints"; // Make setDemoUserPoints available in console
 
 function MainApp() {
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(
@@ -58,14 +60,120 @@ function MainApp() {
   const { user, isAuthenticated, logout, updateUser } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [currentView, setCurrentView] = useState("home");
   const [topNavView, setTopNavView] = useState("home");
 
   // State untuk menyimpan stack navigasi
   const [navigationStack, setNavigationStack] = useState<
-    Array<{ activeTab: string; currentView: string }>
-  >([{ activeTab: "home", currentView: "home" }]);
+    Array<{ activeTab: string; currentView: string; topNavView?: string; showChatSupport?: boolean }>
+  >([
+    { activeTab: "home", currentView: "home", topNavView: "home", showChatSupport: false },
+  ]);
+
+  // Push navigation states into stack when main navigation changes
+  useEffect(() => {
+    const newState = { activeTab, currentView, topNavView, showChatSupport };
+    setNavigationStack((prev) => {
+      const last = prev[prev.length - 1];
+      if (
+        last?.activeTab === newState.activeTab &&
+        last?.currentView === newState.currentView &&
+        last?.topNavView === newState.topNavView &&
+        !!last?.showChatSupport === !!newState.showChatSupport
+      ) {
+        return prev;
+      }
+      return [...prev, newState];
+    });
+  }, [activeTab, currentView, topNavView, showChatSupport]);
+
+  // Handler to pop navigation stack and restore previous state
+  const popNavigationStack = () => {
+    setNavigationStack((prev) => {
+      if (prev.length <= 1) return prev;
+      const newStack = prev.slice(0, -1);
+      const last = newStack[newStack.length - 1];
+      // Restore UI state from last
+      setActiveTab(last.activeTab);
+      setCurrentView(last.currentView);
+      setTopNavView(last.topNavView || "home");
+      setShowChatSupport(!!last.showChatSupport);
+      return newStack;
+    });
+  };
+
+  // Back button handler for Android hardware back
+  useEffect(() => {
+    let unsubscribe: any;
+
+    const setupListener = async () => {
+      const handler = await CapacitorApp.addListener("backButton", (event) => {
+      // Priority: close modals / panels first
+      if (showQRScannerModal) {
+        setShowQRScannerModal(false);
+        return;
+      }
+      if (showCashOutModal) {
+        setShowCashOutModal(false);
+        return;
+      }
+      if (showReminderModal) {
+        setShowReminderModal(false);
+        return;
+      }
+      if (showNotifications) {
+        setShowNotifications(false);
+        return;
+      }
+
+      // If chat support is open, close it
+      if (showChatSupport) {
+        setShowChatSupport(false);
+        return;
+      }
+
+      // If there's navigation history, go back
+      if (navigationStack.length > 1) {
+        popNavigationStack();
+        return;
+      }
+
+      // If at home (root) then ask for exit confirmation
+      const isAtHome =
+        activeTab === "home" && currentView === "home" && topNavView === "home" && !showChatSupport;
+
+      if (isAtHome) {
+        setShowExitConfirm(true);
+        return;
+      }
+
+      // Fallback: show exit confirm
+      setShowExitConfirm(true);
+    });
+    unsubscribe = handler;
+    };
+
+    setupListener();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe.remove();
+      }
+    };
+    // Intentionally not adding navigationStack as dependency to avoid re-registering handler too often
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    showQRScannerModal,
+    showCashOutModal,
+    showReminderModal,
+    showNotifications,
+    showChatSupport,
+    activeTab,
+    currentView,
+    topNavView,
+  ]);
 
   // Reload articles when component mounts or when returning from certain views
   // Removed duplicated useEffect related to splash screen and articles loading
@@ -506,6 +614,41 @@ function MainApp() {
               onClick={() => {
                 setShowLogoutConfirm(false);
                 logout();
+              }}
+            >
+              Keluar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exit Confirmation Dialog (when pressing hardware back at home) */}
+      <Dialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Keluar Aplikasi</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            Apakah Anda ingin menutup aplikasi ini?
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExitConfirm(false)}>
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowExitConfirm(false);
+                try {
+                  CapacitorApp.exitApp();
+                } catch (e) {
+                  // Fallback for web
+                  try {
+                    window.close();
+                  } catch (e) {
+                    // nothing
+                  }
+                }
               }}
             >
               Keluar

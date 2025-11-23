@@ -20,7 +20,8 @@ import {
   Mic
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import { useAuth } from "./AuthContext";
 
 interface ChatMessage {
   id: string;
@@ -39,6 +40,7 @@ interface ChatSupportViewProps {
 }
 
 export function ChatSupportView({ onBack }: ChatSupportViewProps) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -74,6 +76,36 @@ export function ChatSupportView({ onBack }: ChatSupportViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Load chat history from localStorage on mount
+  useEffect(() => {
+    loadChatHistory();
+  }, []);
+
+  const loadChatHistory = () => {
+    try {
+      if (!user?.id) return;
+
+      const chatsJson = localStorage.getItem(`ecobank_chats_${user.id}`);
+      if (chatsJson) {
+        const chats = JSON.parse(chatsJson);
+        const formattedMessages = chats.map((chat: any, index: number) => ({
+          id: index.toString(),
+          type: chat.type || 'agent',
+          message: chat.message,
+          timestamp: new Date(chat.timestamp),
+          status: 'read',
+          agent: chat.type === 'user' ? undefined : {
+            name: 'Admin Support',
+            avatar: 'AS'
+          }
+        }));
+        setMessages(formattedMessages);
+      }
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+    }
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -83,7 +115,7 @@ export function ChatSupportView({ onBack }: ChatSupportViewProps) {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !user?.id) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -97,6 +129,21 @@ export function ChatSupportView({ onBack }: ChatSupportViewProps) {
     setInputMessage('');
     setIsTyping(true);
 
+    // Save user message to localStorage
+    try {
+      const chatsJson = localStorage.getItem(`ecobank_chats_${user.id}`);
+      const chats = chatsJson ? JSON.parse(chatsJson) : [];
+      chats.push({
+        type: 'user',
+        message: inputMessage,
+        timestamp: new Date().toISOString(),
+        read: false
+      });
+      localStorage.setItem(`ecobank_chats_${user.id}`, JSON.stringify(chats));
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+
     // Simulate agent response
     setTimeout(() => {
       setAgentStatus('typing');
@@ -109,14 +156,29 @@ export function ChatSupportView({ onBack }: ChatSupportViewProps) {
         message: generateAgentResponse(inputMessage),
         timestamp: new Date(),
         agent: {
-          name: 'Sarah',
-          avatar: 'S'
+          name: 'Admin Support',
+          avatar: 'AS'
         }
       };
 
       setMessages(prev => [...prev, agentResponse]);
       setIsTyping(false);
       setAgentStatus('online');
+      
+      // Save agent message to localStorage
+      try {
+        const chatsJson = localStorage.getItem(`ecobank_chats_${user.id}`);
+        const chats = chatsJson ? JSON.parse(chatsJson) : [];
+        chats.push({
+          type: 'admin',
+          message: agentResponse.message,
+          timestamp: new Date().toISOString(),
+          read: true
+        });
+        localStorage.setItem(`ecobank_chats_${user.id}`, JSON.stringify(chats));
+      } catch (error) {
+        console.error("Error saving agent message:", error);
+      }
       
       // Mark user message as read
       setMessages(prev => prev.map(msg => 
@@ -215,7 +277,7 @@ export function ChatSupportView({ onBack }: ChatSupportViewProps) {
               <div className="relative">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-green-600 text-white">
-                    CS
+                    AS
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">

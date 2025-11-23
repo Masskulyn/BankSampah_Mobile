@@ -44,7 +44,8 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import RedemptionsView from "./RedemptionsView";
 
 interface ProfileViewProps {
   userData: {
@@ -396,6 +397,16 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
             </div>
             <ChevronRight size={16} className="text-gray-400" />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Redemption History */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Riwayat Penukaran</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RedemptionsView />
         </CardContent>
       </Card>
 

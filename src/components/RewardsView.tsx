@@ -3,8 +3,18 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { useState } from "react";
-import { toast } from "sonner@2.0.3";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useAuth } from "./AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "./ui/dialog";
+import RedemptionsView from "./RedemptionsView";
+import { postRedemption } from "../utils/api";
 
 interface Reward {
   id: string;
@@ -21,9 +31,50 @@ interface RewardsViewProps {
 }
 
 export function RewardsView({ onBack }: RewardsViewProps = {}) {
-  const [userPoints] = useState(7850); // Mock user points
+  const { user, updateUser } = useAuth();
 
-  const rewards: Reward[] = [
+  // Load user points from localStorage per user (fallback to demo value)
+  const getStoredPoints = () => {
+    try {
+      if (user && user.id) {
+        const key = `ecobank_points_${user.id}`;
+        const v = localStorage.getItem(key);
+        if (v) return parseInt(v, 10);
+      }
+      const guest = localStorage.getItem("ecobank_guest_points");
+      if (guest) return parseInt(guest, 10);
+    } catch (e) {
+      console.error(e);
+    }
+    return 7850;
+  };
+
+  const [userPoints, setUserPoints] = useState<number>(getStoredPoints());
+
+  useEffect(() => {
+    // persist points whenever they change
+    try {
+      if (user && user.id) {
+        localStorage.setItem(`ecobank_points_${user.id}`, String(userPoints));
+      } else {
+        localStorage.setItem("ecobank_guest_points", String(userPoints));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    // Optionally update user record if you want points stored there
+    if (user && updateUser) {
+      // store points in user object (will be saved to localStorage via updateUser)
+      try {
+        // @ts-ignore - add points field dynamically for demo
+        updateUser({ points: userPoints } as any);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [userPoints]);
+
+  const initialRewards: Reward[] = [
     {
       id: "1",
       name: "Pulsa Rp 10.000",
@@ -83,16 +134,111 @@ export function RewardsView({ onBack }: RewardsViewProps = {}) {
   const categories = ["Semua", "Pulsa", "E-wallet", "Voucher"];
   const [selectedCategory, setSelectedCategory] = useState("Semua");
 
-  const filteredRewards = selectedCategory === "Semua" 
-    ? rewards 
-    : rewards.filter(r => r.category === selectedCategory);
+  const [rewardsState, setRewardsState] = useState<Reward[]>(initialRewards);
 
-  const handleRedeem = (reward: Reward) => {
-    if (userPoints >= reward.points) {
-      toast.success(`Berhasil menukar ${reward.name}!`);
-    } else {
+  const filteredRewards = selectedCategory === "Semua"
+    ? rewardsState
+    : rewardsState.filter(r => r.category === selectedCategory);
+
+  const [showRedeemDialog, setShowRedeemDialog] = useState<boolean>(false);
+  const [redeemTarget, setRedeemTarget] = useState<Reward | null>(null);
+
+  const openRedeemDialog = (reward: Reward) => {
+    if (userPoints < reward.points) {
       toast.error(`Poin tidak cukup. Anda membutuhkan ${reward.points - userPoints} poin lagi.`);
+      return;
     }
+    setRedeemTarget(reward);
+    setShowRedeemDialog(true);
+  };
+
+  const performRedeem = async () => {
+    const reward = redeemTarget;
+    if (!reward) return;
+
+    // Deduct points locally first
+    const newPoints = userPoints - reward.points;
+    setUserPoints(newPoints);
+
+    // Save redemption record (pending) locally
+    const redemptionsKey = "ecobank_redemptions";
+    try {
+      const existing = localStorage.getItem(redemptionsKey);
+      const arr = existing ? JSON.parse(existing) : [];
+      const record = {
+        id: Date.now().toString(36) + Math.random().toString(36).substring(2),
+        userId: user?.id || "guest",
+        rewardId: reward.id,
+        rewardName: reward.name,
+        points: reward.points,
+        date: new Date().toISOString(),
+        status: "pending"
+      };
+      arr.push(record);
+      localStorage.setItem(redemptionsKey, JSON.stringify(arr));
+      toast.success(`Penukaran terdaftar! ${reward.points.toLocaleString()} poin terpakai. Menunggu proses.`);
+
+      // Call backend API to process redemption
+      try {
+        const resp = await postRedemption({
+          id: record.id,
+          userId: record.userId,
+          rewardId: record.rewardId,
+          rewardName: record.rewardName,
+          points: record.points,
+          date: record.date,
+        });
+
+        // On success update local record to completed
+        const raw2 = localStorage.getItem(redemptionsKey);
+        const arr2 = raw2 ? JSON.parse(raw2) : [];
+        const idx = arr2.findIndex((r: any) => r.id === record.id);
+        if (idx !== -1) {
+          arr2[idx].status = resp.success ? "completed" : "failed";
+          arr2[idx].completedAt = resp.processedAt || new Date().toISOString();
+          localStorage.setItem(redemptionsKey, JSON.stringify(arr2));
+          if (resp.success) {
+            toast.success(`Penukaran ${record.rewardName} berhasil diproses oleh server.`);
+          } else {
+            toast.error(`Penukaran gagal diproses oleh server.`);
+          }
+        }
+      } catch (apiErr) {
+        // Keep record pending and inform user
+        console.error("API error", apiErr);
+        toast.info("Penukaran disimpan sebagai pending. Akan dicoba sinkronisasi nanti.");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Terjadi kesalahan saat menyimpan penukaran.");
+    }
+
+    // Decrement stock in UI state
+    setRewardsState((prev) => prev.map((r) => r.id === reward.id ? { ...r, stock: Math.max(0, r.stock - 1) } : r));
+
+    setShowRedeemDialog(false);
+    setRedeemTarget(null);
+  };
+
+  // Simulate backend sync: after delay, mark pending redemption as completed
+  const simulateSync = (redemptionId: string) => {
+    // Simulate network latency + processing
+    setTimeout(() => {
+      try {
+        const key = "ecobank_redemptions";
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        const arr = JSON.parse(raw);
+        const idx = arr.findIndex((r: any) => r.id === redemptionId);
+        if (idx === -1) return;
+        arr[idx].status = "completed";
+        arr[idx].completedAt = new Date().toISOString();
+        localStorage.setItem(key, JSON.stringify(arr));
+        toast.success(`Penukaran ${arr[idx].rewardName} telah selesai diproses.`);
+      } catch (e) {
+        console.error(e);
+      }
+    }, 3000 + Math.floor(Math.random() * 4000));
   };
 
   return (
@@ -145,6 +291,35 @@ export function RewardsView({ onBack }: RewardsViewProps = {}) {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Redeem Confirmation Dialog */}
+      <Dialog open={showRedeemDialog} onOpenChange={setShowRedeemDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Penukaran</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            {redeemTarget ? (
+              <>
+                Tukar <strong>{redeemTarget.name}</strong> dengan <strong>{redeemTarget.points.toLocaleString()}</strong> poin?
+                <div className="text-sm text-gray-500 mt-2">Stok tersisa: {redeemTarget.stock}</div>
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRedeemDialog(false)}>Batal</Button>
+            <Button variant="destructive" onClick={performRedeem}>Tukar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Redemptions History (inline) */}
+      <div className="mt-4">
+        <h3 className="font-semibold mb-2">Riwayat Penukaran</h3>
+        <RedemptionsView />
       </div>
 
       {/* Category Filter */}
@@ -241,7 +416,7 @@ export function RewardsView({ onBack }: RewardsViewProps = {}) {
                       : "bg-gray-300 text-gray-500"
                   }`}
                   disabled={!canAfford}
-                  onClick={() => handleRedeem(reward)}
+                  onClick={() => openRedeemDialog(reward)}
                 >
                   {canAfford ? (
                     <>
