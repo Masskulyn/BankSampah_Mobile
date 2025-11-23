@@ -5,11 +5,13 @@ Panduan lengkap untuk build APK menggunakan Gradle wrapper tanpa perlu membuka A
 ## Prerequisites
 
 1. **Node.js** (v16+)
+
    ```bash
    node --version
    ```
 
 2. **JDK 11+**
+
    ```bash
    java -version
    ```
@@ -21,6 +23,7 @@ Panduan lengkap untuk build APK menggunakan Gradle wrapper tanpa perlu membuka A
 ## Step 1: Setup Environment Variables
 
 ### Windows (PowerShell)
+
 ```powershell
 # Set JAVA_HOME
 [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-11", [EnvironmentVariableTarget]::User)
@@ -36,6 +39,7 @@ $currentPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariabl
 ```
 
 ### Mac/Linux
+
 ```bash
 export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 export ANDROID_HOME=$HOME/Library/Android/Sdk
@@ -83,13 +87,11 @@ npx cap sync android
 cd android
 
 # Windows
-gradlew.bat assembleDebug
-
-# Mac/Linux
 ./gradlew assembleDebug
 ```
 
 APK akan tersimpan di:
+
 ```
 android/app/build/outputs/apk/debug/app-debug.apk
 ```
@@ -107,6 +109,7 @@ keytool -genkey -v -keystore keystore/ecobank.keystore -alias ecobank -keyalg RS
 ```
 
 Isikan data:
+
 - Keystore password: `[your-secure-password]`
 - Key password: `[same-password]`
 - First and last name: `EcoBank Admin`
@@ -158,6 +161,7 @@ gradlew.bat assembleRelease  # Windows
 ```
 
 Release APK akan tersimpan di:
+
 ```
 android/app/build/outputs/apk/release/app-release.apk
 ```
@@ -175,12 +179,14 @@ adb install android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ### Via Emulator UI
+
 1. Drag & drop APK file ke emulator window
 2. Emulator akan auto install
 
 ## Troubleshooting
 
 ### Error: JAVA_HOME not set
+
 ```bash
 # Cek path JDK
 which java              # Mac/Linux
@@ -204,6 +210,7 @@ yes | sdkmanager --licenses
 ### Gradle Build Failed
 
 Clear cache dan rebuild:
+
 ```bash
 cd android
 gradlew clean
@@ -213,6 +220,7 @@ gradlew assembleDebug
 ### APK terlalu besar
 
 Tambahkan minification:
+
 ```gradle
 buildTypes {
     release {
@@ -226,6 +234,7 @@ buildTypes {
 ### APK tidak run di device
 
 Pastikan API level device sesuai:
+
 ```bash
 # Cek device API level
 adb shell getprop ro.build.version.sdk
@@ -272,6 +281,7 @@ fi
 ```
 
 Gunakan:
+
 ```bash
 chmod +x build-apk.sh
 ./build-apk.sh
@@ -279,16 +289,17 @@ chmod +x build-apk.sh
 
 ## Perbandingan Build Methods
 
-| Method | Kecepatan | Mudah | Native Perf |
-|--------|-----------|-------|------------|
-| **Gradle (Recommended)** | ⚡⚡⚡ | ✅ | ✅✅✅ |
-| Android Studio | ⚡ | ✅ | ✅✅✅ |
-| PWA Builder | ⚡⚡ | ✅✅ | ⚠️ |
-| Cordova | ⚡ | ⚠️ | ⚠️ |
+| Method                   | Kecepatan | Mudah | Native Perf |
+| ------------------------ | --------- | ----- | ----------- |
+| **Gradle (Recommended)** | ⚡⚡⚡    | ✅    | ✅✅✅      |
+| Android Studio           | ⚡        | ✅    | ✅✅✅      |
+| PWA Builder              | ⚡⚡      | ✅✅  | ⚠️          |
+| Cordova                  | ⚡        | ⚠️    | ⚠️          |
 
 ## Deployment
 
 ### Install di Multiple Devices
+
 ```bash
 for device in $(adb devices | grep -v "List" | awk '{print $1}'); do
     adb -s $device install app/build/outputs/apk/debug/app-debug.apk
@@ -296,7 +307,9 @@ done
 ```
 
 ### Upload ke Google Play
+
 1. Build app bundle:
+
    ```bash
    cd android
    ./gradlew bundleRelease

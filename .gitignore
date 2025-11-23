@@ -51,3 +51,6 @@ android/app/build/
 # iOS
 ios/build/
 *.ipa
+
+# other
+laporan bug
