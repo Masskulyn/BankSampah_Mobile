@@ -357,7 +357,7 @@ export function QRScannerModal({
         <div className="space-y-4">
           {!isScanning ? (
             <div className="text-center py-8">
-              <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+              <div className="mx-auto mb-4 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                 <Camera size={32} className="text-white" />
               </div>
               <h3 className="font-semibold mb-2 text-sm md:text-base">

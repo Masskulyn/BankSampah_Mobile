@@ -32,18 +32,20 @@ import { NotificationPanel } from "./components/NotificationPanel";
 import { Bell, LogOut } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "./components/ui/dialog";
 import { mockTransactions } from "./data/mockTransactions";
 import { mockNews } from "./data/mockNews";
 import { loadAllArticles, incrementArticleViews } from "./utils/articleHelpers";
 import "./data/demoUsers"; // Initialize demo users
 
 function MainApp() {
-  const { user, isAuthenticated, logout, updateUser } = useAuth();
-  const [showSplash, setShowSplash] = useState(true);
-  const [activeTab, setActiveTab] = useState("home");
-  const [currentView, setCurrentView] = useState("home");
-  const [topNavView, setTopNavView] = useState("home");
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(
     null
   );
@@ -53,19 +55,20 @@ function MainApp() {
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [allArticles, setAllArticles] = useState(() => loadAllArticles());
+  const { user, isAuthenticated, logout, updateUser } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState("home");
+  const [currentView, setCurrentView] = useState("home");
+  const [topNavView, setTopNavView] = useState("home");
+
+  // State untuk menyimpan stack navigasi
+  const [navigationStack, setNavigationStack] = useState<
+    Array<{ activeTab: string; currentView: string }>
+  >([{ activeTab: "home", currentView: "home" }]);
 
   // Reload articles when component mounts or when returning from certain views
-  useEffect(() => {
-    setAllArticles(loadAllArticles());
-  }, [currentView, activeTab]);
-
-  // Show splash screen on first load
-  useEffect(() => {
-    const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
-    if (hasSeenSplash) {
-      setShowSplash(false);
-    }
-  }, []);
+  // Removed duplicated useEffect related to splash screen and articles loading
 
   const handleSplashFinish = () => {
     setShowSplash(false);
@@ -450,7 +453,7 @@ function MainApp() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={logout}
+                  onClick={() => setShowLogoutConfirm(true)}
                   className="p-2 md:p-3 hover:bg-red-50 hover:text-red-600 rounded-xl md:rounded-2xl transition-all duration-200"
                   title="Keluar"
                 >
@@ -481,6 +484,35 @@ function MainApp() {
 
       {/* Chat Support (Full Screen) */}
       {showChatSupport && renderContent()}
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Keluar Aplikasi</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            Apakah Anda yakin ingin keluar dari aplikasi?
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutConfirm(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowLogoutConfirm(false);
+                logout();
+              }}
+            >
+              Keluar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Cash Out Modal */}
       <CashOutModal

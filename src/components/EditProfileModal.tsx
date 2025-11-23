@@ -154,9 +154,9 @@ export function EditProfileModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md mx-2 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 justify-center sm:justify-start">
             <User className="text-blue-600" size={20} />
             Edit Informasi Personal
           </DialogTitle>

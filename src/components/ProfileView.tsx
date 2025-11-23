@@ -40,6 +40,8 @@ import {
   FileText,
   MessageCircle,
   ExternalLink,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner@2.0.3";
@@ -229,7 +231,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
         <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 p-6 text-white">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="relative">
+              <div className="relative mr-2 md:mr-2">
                 <Avatar className="w-20 h-20 ring-4 ring-white/30">
                   <AvatarImage
                     src={profileData.profileImage}
@@ -242,15 +244,8 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <Button
-                  size="icon"
-                  onClick={handleChangePhoto}
-                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-white/90 hover:bg-white text-green-600 rounded-full shadow-lg"
-                >
-                  <Camera size={14} />
-                </Button>
               </div>
-              <div>
+              <div className="mr-2 md:mr-0 -right-2">
                 <h3 className="text-xl font-bold mb-1">
                   {user?.name || userData.name}
                 </h3>
@@ -278,7 +273,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
               variant="ghost"
               size="icon"
               onClick={handleEditProfile}
-              className="text-white/80 hover:text-white hover:bg-white/20"
+              className="text-white/80 hover:text-white hover:bg-white/20 w-6 h-6 md:w-8 md:h-8"
             >
               <Edit size={18} />
             </Button>
@@ -297,7 +292,7 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowBalance(!showBalance)}
-                  className="ml-1 w-6 h-6 text-white/70 hover:text-white hover:bg-white/20"
+                  className="ml-1 w-5 h-5 md:w-6 md:h-6 text-white/70 hover:text-white hover:bg-white/20"
                 >
                   {showBalance ? <Eye size={12} /> : <EyeOff size={12} />}
                 </Button>
@@ -434,7 +429,31 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                             Pengingat jadwal setor
                           </p>
                         </div>
+                        <div className="flex items-center justify-end md:hidden">
+                          <button
+                            onClick={() =>
+                              handleNotificationChange(
+                                "deposit",
+                                !notifications.deposit
+                              )
+                            }
+                            aria-label={`Toggle Notifikasi Setor Sampah`}
+                            className={`p-2 rounded-full ${
+                              notifications.deposit
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            <ChevronRight
+                              size={16}
+                              className={`transform transition-transform ${
+                                notifications.deposit ? "rotate-90" : "rotate-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <Switch
+                          className="hidden md:flex"
                           checked={notifications.deposit}
                           onCheckedChange={(value) =>
                             handleNotificationChange("deposit", value)
@@ -448,7 +467,31 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                             Konfirmasi pencairan
                           </p>
                         </div>
+                        <div className="flex items-center justify-end md:hidden">
+                          <button
+                            onClick={() =>
+                              handleNotificationChange(
+                                "cashout",
+                                !notifications.cashout
+                              )
+                            }
+                            aria-label={`Toggle Notifikasi Penarikan Saldo`}
+                            className={`p-2 rounded-full ${
+                              notifications.cashout
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            <ChevronRight
+                              size={16}
+                              className={`transform transition-transform ${
+                                notifications.cashout ? "rotate-90" : "rotate-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <Switch
+                          className="hidden md:flex ml-4"
                           checked={notifications.cashout}
                           onCheckedChange={(value) =>
                             handleNotificationChange("cashout", value)
@@ -462,7 +505,31 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                             Update artikel terbaru
                           </p>
                         </div>
+                        <div className="flex items-center justify-end md:hidden">
+                          <button
+                            onClick={() =>
+                              handleNotificationChange(
+                                "news",
+                                !notifications.news
+                              )
+                            }
+                            aria-label={`Toggle Notifikasi Berita & Tips`}
+                            className={`p-2 rounded-full ${
+                              notifications.news
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            <ChevronRight
+                              size={16}
+                              className={`transform transition-transform ${
+                                notifications.news ? "rotate-90" : "rotate-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <Switch
+                          className="hidden md:flex"
                           checked={notifications.news}
                           onCheckedChange={(value) =>
                             handleNotificationChange("news", value)
@@ -476,7 +543,31 @@ export function ProfileView({ userData, onChatSupport }: ProfileViewProps) {
                             Penawaran khusus
                           </p>
                         </div>
+                        <div className="flex items-center justify-end md:hidden">
+                          <button
+                            onClick={() =>
+                              handleNotificationChange(
+                                "promo",
+                                !notifications.promo
+                              )
+                            }
+                            aria-label={`Toggle Notifikasi Promo & Reward`}
+                            className={`p-2 rounded-full ${
+                              notifications.promo
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            <ChevronRight
+                              size={16}
+                              className={`transform transition-transform ${
+                                notifications.promo ? "rotate-90" : "rotate-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <Switch
+                          className="hidden md:flex"
                           checked={notifications.promo}
                           onCheckedChange={(value) =>
                             handleNotificationChange("promo", value)
